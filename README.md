@@ -14,8 +14,8 @@ This is the FastAPI backend for the **SymptoCare** app — an AI-powered wellnes
 ### 1. 📦 Clone the Repo
 
 ```bash
-git clone https://github.com/your-username/symptocare-capstone.git
-cd symptocare-capstone/backend
+git clone https://github.com/el-riber/Capstone1.git
+cd Capstone1/backend
 ````
 
 ---
