@@ -1,4 +1,4 @@
-// lib/api.ts
+
 import { supabase } from "@/lib/supabaseClient";
 
 export interface MoodEntryDTO {
@@ -86,3 +86,4 @@ export async function fetchWeeklySummaryFromEntries(entries: MoodEntryDTO[]): Pr
   const data = await res.json();
   return data.summary ?? "No summary generated.";
 }
+
