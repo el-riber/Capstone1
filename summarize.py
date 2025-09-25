@@ -1,18 +1,17 @@
-# app/routers/insights.py
+
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from typing import List, Dict, Any
 from datetime import datetime, timedelta, timezone
 import os
 
-from app.utils.supabase_client import supabase  # must be initialized with SERVICE ROLE key
+from app.utils.supabase_client import supabase 
 from openai import OpenAI
 
 router = APIRouter()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# --- Mood helpers (aligned with your UI: 1..8) ---
-# UI mapping: 1 Angry, 2 Stressed, 3 Very Sad, 4 Sad, 5 Neutral, 6 Happy, 7 Very Happy, 8 Excited
+
 MOOD_LABELS = {
     1: "Angry",
     2: "Stressed",
@@ -35,7 +34,7 @@ def mood_to_wellness(mood_value: int) -> int:
 def get_mood_description(mood_value: int) -> str:
     return MOOD_LABELS.get(mood_value, "Unknown")
 
-# --- OpenAI summary generation ---
+
 def generate_mood_summary(entries: List[Dict[str, Any]]) -> str:
     if not entries:
         return "No mood entries available for analysis."
@@ -84,7 +83,7 @@ Please provide:
 Keep the response supportive, non-judgmental, and focused on growth. Limit to 250 words."""
 
     try:
-        # If you have access to GPT-4, use it; otherwise consider a smaller model like "gpt-4o-mini".
+       
         resp = client.chat.completions.create(
             model=os.getenv("OPENAI_MODEL", "gpt-4"),
             messages=[
@@ -111,14 +110,14 @@ Keep the response supportive, non-judgmental, and focused on growth. Limit to 25
             "Keep tracking your moods—this data helps build valuable insights over time."
         )
 
-# --- I/O models ---
+
 class EntriesIn(BaseModel):
     entries: List[Dict[str, Any]]
 
 class SummaryOut(BaseModel):
     summary: str
 
-# --- Data access ---
+
 async def fetch_last_7_days_entries(user_id: str) -> List[Dict[str, Any]]:
     """
     Prefer enhanced_mood_entries; if empty, fall back to mood_entries.
@@ -126,7 +125,7 @@ async def fetch_last_7_days_entries(user_id: str) -> List[Dict[str, Any]]:
     """
     since = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
 
-    # Try enhanced table first
+ 
     enh = supabase.table("enhanced_mood_entries") \
         .select("mood,mood_emoji,reflection,created_at") \
         .eq("user_id", user_id) \
@@ -137,7 +136,7 @@ async def fetch_last_7_days_entries(user_id: str) -> List[Dict[str, Any]]:
     data = (enh.data or []) if enh else []
 
     if not data:
-        # Fallback to legacy table
+        
         legacy = supabase.table("mood_entries") \
             .select("mood,emoji,reflection,created_at") \
             .eq("user_id", user_id) \
@@ -146,7 +145,7 @@ async def fetch_last_7_days_entries(user_id: str) -> List[Dict[str, Any]]:
             .execute()
         data = (legacy.data or []) if legacy else []
 
-    # Normalize emoji field
+    
     normalized = []
     for r in data:
         normalized.append({
@@ -157,7 +156,7 @@ async def fetch_last_7_days_entries(user_id: str) -> List[Dict[str, Any]]:
         })
     return normalized
 
-# --- Routes your frontend calls ---
+
 
 @router.get("/insights/summary", response_model=SummaryOut)
 async def insights_summary(user_id: str = Query(..., description="Supabase user id")):
