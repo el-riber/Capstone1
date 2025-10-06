@@ -77,8 +77,8 @@ This is the frontend for the **SymptoCare** capstone project — a professional 
 ### 1. 📦 Clone the Repo
 
 ```bash
-git clone https://github.com/your-username/symptocare-capstone.git
-cd symptocare-capstone/frontend
+git clone https://github.com/el-riber/Capstone1.git
+cd Capstone1/frontend
 ````
 
 ---
